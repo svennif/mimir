@@ -13,7 +13,7 @@ const navItems = [
 export default function Sidebar({ onClick }: { onClick?: () => void }) {
   const pathname = usePathname();
   return (
-    <aside className="w-64 shrink-0 overflow-y-auto">
+    <aside className="w-64 shrink-0 overflow-y-auto bg-amber-900 px-3 pb-4 pt-3.5">
       <section className="flex flex-row gap-2 items-center">
         <Image src={Logo} alt="Logo" width={52} height={52} loading="eager" />
         <p>Mirmir</p>
@@ -24,7 +24,7 @@ export default function Sidebar({ onClick }: { onClick?: () => void }) {
             {navItems.map((item) => {
               const isActive = item.to === '/' ? pathname === '/' : pathname.startsWith(item.to);
               return (
-                <Link key={item.to} href={item.to} onClick={onClick} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}>
+                <Link key={item.to} href={item.to} onClick={onClick} className={`flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}>
                   {item.label}
                 </Link>
               );
