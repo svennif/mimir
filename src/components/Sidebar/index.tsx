@@ -13,7 +13,7 @@ const navItems = [
 export default function Sidebar({ onClick }: { onClick?: () => void }) {
   const pathname = usePathname();
   return (
-    <aside className="w-64 shrink-0 overflow-y-auto bg-amber-900 px-3 pb-4 pt-3.5">
+    <aside className="w-64 shrink-0 overflow-y-auto px-3 pb-4 pt-3.5">
       <section className="flex flex-row gap-2 items-center">
         <Image src={Logo} alt="Logo" width={52} height={52} loading="eager" />
         <p>Mirmir</p>

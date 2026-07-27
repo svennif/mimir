@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
-  pgTable, uuid, text, jsonb, timestamp, index, type AnyPgColumn,
+  pgTable, uuid, text, jsonb, timestamp, index, type AnyPgColumn, integer
 } from "drizzle-orm/pg-core";
 
 export const pages = pgTable("pages", {
@@ -16,6 +16,7 @@ export const pages = pgTable("pages", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull().defaultNow().$onUpdate(() => new Date()),
+  version: integer('version').notNull().default(1),
 }, (table) => [
   index("pages_parent_deleted_position_idx").on(table.parentId, table.deletedAt, table.position),
   index("pages_favorite_position_idx").on(table.favoritePosition),

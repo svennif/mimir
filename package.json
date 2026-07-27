@@ -6,8 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
-    
+    "lint": "eslint",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d db",
+    "db:psql": "docker compose exec db psql -U mimir -d mimir",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "prod:up": "docker compose -f docker-compose.yml up -d --build",
+    "prod:down": "docker compose -f docker-compose.yml down",
+    "prod:logs": "docker compose -f docker-compose.yml logs -f"
   },
   "dependencies": {
     "@blocknote/core": "^0.51.4",
@@ -18,6 +28,7 @@
     "@mantine/utils": "^6.0.22",
     "@prisma/client": "^7.8.0",
     "drizzle-orm": "^1.0.0-rc.4-de6c356",
+    "fractional-indexing": "^4.0.0",
     "next": "16.2.7",
     "postgres": "^3.4.9",
     "react": "19.2.4",
