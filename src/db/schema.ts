@@ -15,7 +15,7 @@ export const pages = pgTable("pages", {
   deletedAt: timestamp("deleted_at", { withTimezone: true }), // soft delete
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull().defaultNow().$onUpdate(() => new Date()),
+    .notNull().defaultNow(),
   version: integer('version').notNull().default(1),
 }, (table) => [
   index("pages_parent_deleted_position_idx").on(table.parentId, table.deletedAt, table.position),

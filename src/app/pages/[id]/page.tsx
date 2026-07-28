@@ -1,11 +1,7 @@
-import { notFound } from "next/navigation";
-import { db } from "@/src/db";
+import { notFound } from 'next/navigation';
+import { db } from '@/src/db';
 
-export default async function PageView({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function PageView({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const page = await db.query.pages.findFirst({
@@ -14,5 +10,5 @@ export default async function PageView({
 
   if (!page) notFound();
 
-  return <h1>{page.title || "Untitled"}</h1>;
+  return <h1>{page.title || 'Untitled'}</h1>;
 }

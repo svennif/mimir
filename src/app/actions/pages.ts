@@ -1,6 +1,6 @@
 'use server';
 
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { generateKeyBetween } from 'fractional-indexing';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -34,4 +34,28 @@ export async function createPage(parentId: string | null = null) {
 
   revalidatePath("/", "layout");
   redirect(`/pages/${page.id}`);
+}
+
+export async function SavePage(
+  pageId: string,
+  content: unknown,
+  textContent: string,
+  clientVersion: number,
+) {
+  const result = await db
+    .update(pages)
+    .set({
+      content,
+      textContent,
+      updatedAt: new Date(),
+      version: sql`${pages.version} + 1`,
+    })
+    .where(and(eq(pages.id, pageId), eq(pages.version, clientVersion)))
+    .returning({ version: pages.version });
+
+  if (result.length === 0) {
+    return { conflict: true as const };
+  }
+
+  return { conflict: false as const, version: result[0].version };
 }
