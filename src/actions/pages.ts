@@ -97,3 +97,46 @@ export async function savePage(input: {
 
   return { ok: true as const, version: result[0].version };
 }
+
+// Move to trash - Recoverable
+export async function trashPage(pageId: string) {
+  await requireAuth();
+
+  // Mark the page AND its whole subtree. Children of a trashed page
+  // must not keep showing up in the sidebar.
+  await db.execute(sql`
+      WITH RECURSIVE subtree AS (
+        SELECT id FROM pages WHERE id = ${pageId}
+        UNION ALL
+        SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
+      )
+      UPDATE pages
+      SET deletedAt = now()
+      WHERE id IN (SELECT id FROM subtree) AND deleted_at IS NULL
+    `);
+  revalidatePath('/', 'layout');
+  redirect('/');
+}
+
+// Restore page from Trash view
+export async function restorePage(pageId: string) {
+  await requireAuth();
+
+  await db.execute(sql`
+    WITH RECURSIVE subtree AS (
+      SELECT id FROM pages WHERE id = ${pageId}
+      UNION ALL
+      SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
+    )
+    UPDATE pages SET deleted_at = NULL WHERE id IN (SELECT id FROM subtree)
+  `);
+
+  revalidatePath("/", "layout");
+}
+
+// Permanently delete - Trash view only
+export async function deletePage(pageId: string) {
+  await requireAuth();
+
+  await db.delete(pages).where(eq(pages.id, pageId));
+}
