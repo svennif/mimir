@@ -2,12 +2,10 @@
 
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
-import { en } from '@blocknote/core/locales';
 import type { Theme } from '@blocknote/mantine';
-import type { PartialBlock } from '@blocknote/core';
+import type { PartialBlock, Block } from '@blocknote/core';
 import '@blocknote/mantine/style.css';
 import './editor.css';
-import { useAutosave } from '@/src/hooks/use-autosave';
 
 const theme: Theme = {
   colors: {
@@ -25,33 +23,10 @@ const theme: Theme = {
   fontFamily: 'var(--font-jakarta), sans-serif',
 };
 
-export default function BlockNoteEditor({ pageId, initialContent, initialVersion, initialTitle }: { pageId: string; initialContent?: PartialBlock[]; initialVersion: number; initialTitle: string }) {
-  const { schedule, status } = useAutosave(pageId, initialVersion, initialTitle);
-
+export default function BlockNoteEditor({ initialContent, onDocumentChange }: { initialContent?: PartialBlock[]; onDocumentChange: (blocks: Block[]) => void }) {
   const editor = useCreateBlockNote({
     initialContent: initialContent?.length ? initialContent : [{ type: 'heading', props: { level: 1 } }],
-    dictionary: {
-      ...en,
-      placeholders: { ...en.placeholders, heading: 'Untitled' },
-    },
   });
 
-  return (
-    <>
-      <span className="text-xs text-ink-tertiary">
-        {status === 'saving' && 'Saving…'}
-        {status === 'saved' && 'Saved'}
-        {status === 'error' && <span className="text-red-600">Save failed — see console</span>}
-      </span>
-      {status === 'conflict' && (
-        <div className="mb-4 w-full rounded-md border border-line bg-active px-4 py-3 text-sm text-ink">
-          This page changed elsewhere. Reload to get the newer version, or overwrite it.
-          <button onClick={() => window.location.reload()} className="ml-3 underline">
-            Reload
-          </button>
-        </div>
-      )}
-      <BlockNoteView editor={editor} theme={theme} className="w-full" onChange={() => schedule(editor.document)} />
-    </>
-  );
+  return <BlockNoteView editor={editor} theme={theme} className="w-full" onChange={() => onDocumentChange(editor.document)} />;
 }

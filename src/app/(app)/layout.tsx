@@ -1,4 +1,5 @@
 import { Sidebar } from '@/src/components/Sidebar';
+import { SidebarShell } from '@/src/components/Sidebar/mobile-shell';
 import { db } from '@/src/db';
 import { getSession } from '@/src/lib/session';
 import { redirect } from 'next/navigation';
@@ -20,8 +21,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex size-full items-start">
-      <Sidebar tree={tree} />
-      <div className="flex h-full min-w-0 flex-1 flex-col items-start overflow-clip pt-3.5 pr-4 pb-4 pl-1">{children}</div>
+      <SidebarShell>
+        <Sidebar tree={tree} />
+      </SidebarShell>
+      <div className="flex h-full min-w-0 flex-1 flex-col items-start overflow-clip md:pt-3.5 md:pr-4 md:pb-4 md:pl-1">{children}</div>
     </div>
   );
 }

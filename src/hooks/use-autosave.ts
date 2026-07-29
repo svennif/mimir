@@ -20,6 +20,7 @@ export function useAutosave(pageId: string, initialVersion: number, initialTitle
   const firstDirtyAt = useRef<number | null>(null);
   const paused = useRef(false);
   const [status, setStatus] = useState<Status>("idle");
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
 
   const flush = useCallback(async () => {
     if (paused.current || !pending.current) return;
@@ -52,6 +53,7 @@ export function useAutosave(pageId: string, initialVersion: number, initialTitle
 
       version.current = res.version;
       lastTitle.current = title;
+      setSavedAt(new Date());
       setStatus("saved");
 
       if (titleChanged) router.refresh();
@@ -89,5 +91,5 @@ export function useAutosave(pageId: string, initialVersion: number, initialTitle
     };
   }, [flush]);
 
-  return { schedule, status };
+  return { schedule, status, savedAt };
 }
