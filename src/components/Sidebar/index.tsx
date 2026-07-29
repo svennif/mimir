@@ -1,6 +1,6 @@
 import { Search, House, Plus, Settings, Trash2, ChevronDown, MoreHorizontal } from 'lucide-react';
 import { SidebarItem } from '../SidebarItem';
-import { NewPageButton } from '../NewPageButton';
+import { NewPageButton } from '../Buttons/NewPageButton';
 import { PageNode, PageTree } from '../PageTree';
 
 export function Sidebar({ tree }: { tree: PageNode[] }) {
@@ -15,8 +15,8 @@ export function Sidebar({ tree }: { tree: PageNode[] }) {
       </div>
       {/* Menu */}
       <nav className="flex w-full flex-col items-start gap-px overflow-clip py-2">
-        <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" />
         <SidebarItem href="/" icon={<House className="size-4" />} label="Home" />
+        <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" />
       </nav>
       {/* Private pages */}
       <div className="flex w-full flex-col items-start gap-px overflow-clip pt-3">

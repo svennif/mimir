@@ -4,13 +4,13 @@ export function DocumentSheet({ children, isFavorite }: { children: React.ReactN
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col items-start overflow-clip md:rounded-lg border border-line bg-sheet shadow-sheet">
       <div className="absolute top-4.25 right-5.75 z-10 flex items-center gap-3.5">
-        <button className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
+        <button name='Favourite' className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
           <Star className={`size-4 ${isFavorite ? 'fill-accent text-accent' : ''}`} />
         </button>
-        <button className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
+        <button name='Comment' className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
           <MessageSquare className="size-4" />
         </button>
-        <button className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
+        <button name='Menu' className="flex size-5 items-center justify-center text-ink-secondary hover:text-ink">
           <MoreHorizontal className="size-4" />
         </button>
       </div>
