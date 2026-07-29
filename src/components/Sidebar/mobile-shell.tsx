@@ -25,7 +25,7 @@ export function SidebarShell({ children }: { children: React.ReactNode }) {
         onClick={(e) => {
           if (open && (e.target as HTMLElement).closest('a, button')) setOpen(false);
         }}
-        className={`fixed inset-y-0 left-0 z-50 flex w-70 flex-col bg-canvas transition-transform duration-200 ease-out md:static md:z-auto md:w-65 md:translate-x-0 md:transition-none ${open ? 'translate-x-0 shadow-overlay' : '-translate-x-full'}`}>
+        className={`fixed h-full inset-y-0 left-0 z-50 flex w-70 flex-col bg-canvas transition-transform duration-200 ease-out md:static md:z-auto md:w-65 md:translate-x-0 md:transition-none ${open ? 'translate-x-0 shadow-overlay' : '-translate-x-full'}`}>
         {/* Mobile-only drawer header — pushes the sidebar down instead of overlapping it */}
         <div className="flex h-12 shrink-0 items-center justify-end px-3 md:hidden">
           <button type="button" onClick={() => setOpen(false)} aria-label="Close navigation" className="flex size-8 items-center justify-center rounded-md text-ink-secondary hover:bg-hover">

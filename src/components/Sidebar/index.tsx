@@ -6,7 +6,6 @@ import { PageNode, PageTree } from '../PageTree';
 export function Sidebar({ tree }: { tree: PageNode[] }) {
   return (
     <aside className="flex h-full w-full flex-col items-start overflow-clip px-3 pt-3.5 pb-4">
-      {' '}
       {/* Workspace switcher */}
       <div className="flex w-full items-center gap-2 overflow-clip px-2 py-1.5">
         <div className="flex size-5.5 shrink-0 items-center justify-center overflow-clip rounded-[11px] bg-accent text-[13px] font-semibold text-ink-inverse">M</div>
