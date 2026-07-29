@@ -1,6 +1,6 @@
 "use client";
 
-import { createPage } from "@/src/app/actions/pages";
+import { createPage } from "@/src/actions/pages";
 import { useTransition } from "react";
 
 export function NewPageButton({

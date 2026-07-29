@@ -38,6 +38,11 @@ export default function BlockNoteEditor({ pageId, initialContent, initialVersion
 
   return (
     <>
+      <span className="text-xs text-ink-tertiary">
+        {status === 'saving' && 'Saving…'}
+        {status === 'saved' && 'Saved'}
+        {status === 'error' && <span className="text-red-600">Save failed — see console</span>}
+      </span>
       {status === 'conflict' && (
         <div className="mb-4 w-full rounded-md border border-line bg-active px-4 py-3 text-sm text-ink">
           This page changed elsewhere. Reload to get the newer version, or overwrite it.
@@ -47,11 +52,6 @@ export default function BlockNoteEditor({ pageId, initialContent, initialVersion
         </div>
       )}
       <BlockNoteView editor={editor} theme={theme} className="w-full" onChange={() => schedule(editor.document)} />
-      <span className="mt-2 text-xs text-ink-tertiary">
-        {status === 'saving' && 'Saving…'}
-        {status === 'saved' && 'Saved'}
-        {status === 'error' && <span className="text-red-600">Save failed — see console</span>}
-      </span>
     </>
   );
 }

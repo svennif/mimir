@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Block } from "@blocknote/core";
 import { documentToPlainText, extractTitle } from "../lib/blocknote-text";
-import { savePage } from "../app/actions/pages";
+import { savePage } from "../actions/pages";
 import { useRouter } from "next/navigation";
 
 const DEBOUNCE_MS = 2000;

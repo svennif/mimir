@@ -6,13 +6,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/src/db';
 import { pages } from "@/src/db/schema";
+import { requireAuth } from '@/src/lib/auth';
 
 export async function createPage(parentId: string | null = null) {
-  // TODO: authoritative auth check goes here once jose is wired:
-  // const { loggedIn } = await getSession();
-  // if (!loggedIn) throw new Error("Unauthorized");
-
-  // Find the last sibling so we can append after it
+  await requireAuth();
 
   const [lastSibling] = await db
     .select({ position: pages.position })
@@ -37,7 +34,7 @@ export async function createPage(parentId: string | null = null) {
 }
 
 export async function toggleFavourite(pageId: string) {
-  //TODO: auth check
+  await requireAuth();
 
   const [page] = await db
     .select({ favoritePosition: pages.favoritePosition })
@@ -80,7 +77,7 @@ export async function savePage(input: {
   clientVersion: number;
   revalidateTree: boolean;
 }) {
-  // TODO: Auth
+  await requireAuth();
 
   const result = await db
     .update(pages)
