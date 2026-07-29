@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
 import dynamic from 'next/dynamic';
+import type { PartialBlock } from '@blocknote/core';
 
-// BlockNote touches `window` during render, so it cannot be server-rendered.
-// Loading it with ssr: false keeps it client-only (must be done from a Client Component).
 const BlockNoteEditor = dynamic(() => import('./BlockNoteEditor'), {
   ssr: false,
+  loading: () => <div className="text-sm text-ink-tertiary">Loading editor…</div>,
 });
 
-export default function NoteEditor() {
-  return <BlockNoteEditor />;
+export function Editor({ pageId, initialContent, initialVersion, initialTitle }: { pageId: string; initialContent?: PartialBlock[]; initialVersion: number; initialTitle: string }) {
+  return <BlockNoteEditor pageId={pageId} initialContent={initialContent} initialVersion={initialVersion} initialTitle={initialTitle} />;
 }

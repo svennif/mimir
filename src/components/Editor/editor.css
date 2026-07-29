@@ -1,0 +1,24 @@
+/* Kill BlockNote's own horizontal padding — the 708px column already provides it */
+.bn-editor {
+  padding-inline: 0 !important;
+}
+
+.bn-block-content[data-content-type="paragraph"] {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.bn-block-content[data-content-type="heading"][data-level="2"] {
+  font-size: 24px;
+  line-height: 31px;
+  font-weight: 600;
+}
+
+.bn-block-content[data-content-type="codeBlock"] pre {
+  background: var(--bg-code);
+  border-radius: var(--radius-md);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 14px;
+  line-height: 21px;
+  padding: 14px 16px;
+}
