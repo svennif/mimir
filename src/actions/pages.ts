@@ -111,7 +111,7 @@ export async function trashPage(pageId: string) {
         SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
       )
       UPDATE pages
-      SET deletedAt = now()
+      SET deleted_at = now()
       WHERE id IN (SELECT id FROM subtree) AND deleted_at IS NULL
     `);
   revalidatePath('/', 'layout');

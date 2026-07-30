@@ -24,7 +24,7 @@ export function Sidebar({ tree }: { tree: PageNode[] }) {
           <p className="text-xs/4 font-medium text-ink-tertiary">Private</p>
         </div>
         <PageTree nodes={tree} />
-        <NewPageButton className="flex h-8 w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm/5 font-medium text-ink-secondary transition-colors hover:bg-hover" icon={<Plus className="size-4" />} label="Add a page" />
+        <NewPageButton className="flex h-8 w-full items-center gap-2 rounded-md cursor-pointer px-2 py-1.5 text-sm/5 font-medium text-ink-secondary transition-colors hover:bg-hover" icon={<Plus className="size-4" />} label="Add a page" />
       </div>
       <div className="min-h-0 w-full flex-1" />
       {/* Footer */}
