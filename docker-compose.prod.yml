@@ -1,3 +1,4 @@
+services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
