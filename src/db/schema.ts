@@ -4,7 +4,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const pages = pgTable("pages", {
-  id: uuid("id").primaryKey().default(sql`uuidv7()`),
+  id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull().default(''),
   icon: text('icon'), // nullable emoji
   content: jsonb("content").notNull().default(sql`'[]'::jsonb`), // BlockNote Block[] verbatim
@@ -24,7 +24,7 @@ export const pages = pgTable("pages", {
 ]);
 
 export const comments = pgTable("comments", {
-  id: uuid("id").primaryKey().default(sql`uuidv7()`),
+  id: uuid("id").primaryKey().defaultRandom(),
   pageId: uuid("page_id").notNull().references(() => pages.id, { onDelete: "cascade" }),
   blockId: text("block_id"), // BlockNote block.id the comment anchors to
   body: text("body").notNull(),

@@ -1,5 +1,5 @@
 CREATE TABLE "comments" (
-	"id" uuid PRIMARY KEY DEFAULT uuidv7(),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	"page_id" uuid NOT NULL,
 	"block_id" text,
 	"body" text NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE "comments" (
 );
 --> statement-breakpoint
 CREATE TABLE "pages" (
-	"id" uuid PRIMARY KEY DEFAULT uuidv7(),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	"title" text DEFAULT '' NOT NULL,
 	"icon" text,
 	"content" jsonb DEFAULT '[]' NOT NULL,
