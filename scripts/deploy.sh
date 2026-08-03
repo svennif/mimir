@@ -51,6 +51,6 @@ git reset --hard "origin/$BRANCH"
 
 # Rebuild + recreate the stack. The db volume persists; the app image is rebuilt
 # with the new code, pulling build args / env from .env via the compose files.
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml up -d --build
 
 log "deploy complete: now at ${REMOTE:0:7}"

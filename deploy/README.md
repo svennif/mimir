@@ -34,7 +34,6 @@ push to main (from anywhere)
    cp .env.example .env
    openssl rand -hex 24     # POSTGRES_PASSWORD  (also put in DATABASE_URL)
    openssl rand -base64 32  # SESSION_SECRET
-   openssl rand -base64 32  # NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
    # APP_PASSWORD_HASH_B64:
    node -e "console.log(Buffer.from(require('bcrypt').hashSync('YOUR_PASSWORD',10)).toString('base64'))"
    ```
@@ -68,9 +67,8 @@ push to main (from anywhere)
 
 ## Known gaps
 
-- **DB migrations are not run automatically.** `docker compose up --build`
-  rebuilds the app but does not apply Drizzle schema changes. If a deploy
-  includes a schema change, run migrations yourself (or ask to add a migrate
-  step to `deploy.sh`).
+- **DB migrations run automatically.** The one-shot `migrate` service applies
+  pending migrations after Postgres is healthy. The app only starts when the
+  migration exits successfully.
 - **A broken `main` will be deployed.** Polling deploys whatever is on `main`,
   even if it doesn't build/run. Keep `main` releasable, or add a CI check.

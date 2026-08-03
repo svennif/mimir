@@ -15,9 +15,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "prod:up": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
-    "prod:down": "docker compose -f docker-compose.yml -f docker-compose.prod.yml down",
-    "prod:logs": "docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f"
+    "cloudflare:up": "docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml up -d --build",
+    "cloudflare:down": "docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml down",
+    "cloudflare:logs": "docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml logs -f"
   },
   "dependencies": {
     "@blocknote/core": "^0.51.4",
