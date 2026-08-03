@@ -115,7 +115,7 @@ export async function trashPage(pageId: string) {
       WHERE id IN (SELECT id FROM subtree) AND deleted_at IS NULL
     `);
   revalidatePath('/', 'layout');
-  redirect('/');
+  // redirect('/');
 }
 
 // Restore page from Trash view
@@ -138,5 +138,7 @@ export async function restorePage(pageId: string) {
 export async function deletePage(pageId: string) {
   await requireAuth();
 
-  await db.delete(pages).where(eq(pages.id, pageId));
+  await db.delete(pages).where(and(eq(pages.id, pageId), isNotNull(pages.deletedAt)));
+
+  revalidatePath('/', "layout");
 }

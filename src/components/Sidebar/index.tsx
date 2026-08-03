@@ -1,6 +1,6 @@
 import { Search, House, Plus, Settings, Trash2, ChevronDown, MoreHorizontal } from 'lucide-react';
 import { SidebarItem } from '../SidebarItem';
-import { NewPageButton } from '../Buttons/NewPageButton';
+import { NewPageButton } from '../Buttons/NewPageButton/page';
 import { PageNode, PageTree } from '../PageTree';
 
 export function Sidebar({ tree }: { tree: PageNode[] }) {

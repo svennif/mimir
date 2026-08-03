@@ -1,3 +1,4 @@
+import { DeleteButton } from '@/src/components/Buttons/DeleteButton/page';
 import { RestoreButton } from '@/src/components/Buttons/RestoreButton/page';
 import { db } from '@/src/db';
 import { relativeTime } from '@/src/lib/format';
@@ -36,26 +37,23 @@ export default async function TrashPage() {
         </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-8 md:py-6">
-          <ul className="overflow-hidden rounded-lg border border-line" aria-label="Deleted pages">
+          <ul className="overflow-hidden flex flex-col gap-2" aria-label="Deleted pages">
             {trashed.map((page) => {
               const title = page.title || 'Untitled';
 
               return (
-                <li key={page.id} className="flex items-center gap-3 border-b border-line px-3 py-3 last:border-b-0 hover:bg-hover md:px-4">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-hover text-base text-ink-secondary">
-                    {page.icon || <FileText className="size-4" aria-hidden="true" />}
-                  </div>
+                <li key={page.id} className="flex items-center gap-3 border border-line rounded-md px-3 py-3 hover:bg-hover md:px-4">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-hover text-base text-ink-secondary">{page.icon || <FileText className="size-4" aria-hidden="true" />}</div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-ink">{title}</p>
-                    <time
-                      className="mt-0.5 block text-xs text-ink-tertiary"
-                      dateTime={page.deletedAt!.toISOString()}
-                      title={page.deletedAt!.toLocaleString()}
-                    >
+                    <time className="mt-0.5 block text-xs text-ink-tertiary" dateTime={page.deletedAt!.toISOString()} title={page.deletedAt!.toLocaleString()}>
                       Deleted {relativeTime(page.deletedAt!)}
                     </time>
                   </div>
-                  <RestoreButton pageId={page.id} pageTitle={title} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <RestoreButton pageId={page.id} pageTitle={title} />
+                    <DeleteButton pageId={page.id} pageTitle={title} />
+                  </div>
                 </li>
               );
             })}

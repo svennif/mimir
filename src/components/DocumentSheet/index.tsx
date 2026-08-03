@@ -15,8 +15,8 @@ export function DocumentSheet({ children, isFavorite }: { children: React.ReactN
         </button>
       </div>
 
-      <div className="flex min-h-0 w-full flex-1 items-start justify-center overflow-y-auto">
-        <div className="flex w-full max-w-177 shrink-0 flex-col items-start gap-1.5 px-4 pt-15 pb-15 md:px-0 md:pt-16"> {children}</div>
+      <div className="flex min-h-0 w-full flex-1 items-start justify-center overflow-y-auto pt-15 pb-15 md:pt-16">
+        <div className="flex w-full max-w-177 shrink-0 flex-col items-start gap-1.5 px-6 md:px-8 lg:px-10"> {children}</div>
       </div>
     </div>
   );
