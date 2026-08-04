@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { TrashButton } from '../Buttons/TrashButton/page';
+import { NewPageButton } from '../Buttons/NewPageButton/page';
 
 export function SidebarItem({ href, icon, label, depth = 0, pageId }: { href: string; icon: React.ReactNode; label: string; depth?: number; pageId?: string }) {
   const pathname = usePathname();
@@ -17,6 +18,7 @@ export function SidebarItem({ href, icon, label, depth = 0, pageId }: { href: st
       {pageId && (
         <div className="invisible flex shrink-0 items-center opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
           <TrashButton pageId={pageId} />
+          <NewPageButton parentId={pageId} />
         </div>
       )}
     </div>
