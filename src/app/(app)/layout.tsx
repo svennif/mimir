@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <SidebarShell>
         <Sidebar tree={tree} />
       </SidebarShell>
-      <div className="flex h-full min-w-0 flex-1 flex-col items-start overflow-clip md:p-4">{children}</div>
+      <div className="flex h-full min-w-0 flex-1 flex-col items-start overflow-clip md:py-4">{children}</div>
     </div>
   );
 }
