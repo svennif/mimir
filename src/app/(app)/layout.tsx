@@ -1,6 +1,6 @@
 import { Sidebar } from '@/src/components/Sidebar';
 import { SidebarShell } from '@/src/components/Sidebar/mobile-shell';
-import { db } from '@/src/db';
+import { getPageTree } from '@/src/db/queries';
 import { getSession } from '@/src/lib/session';
 import { redirect } from 'next/navigation';
 
@@ -8,16 +8,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { loggedIn } = await getSession();
   if (!loggedIn) redirect('/login');
 
-  const tree = await db.query.pages.findMany({
-    where: { parentId: { isNull: true }, deletedAt: { isNull: true } },
-    orderBy: { position: 'asc' },
-    with: {
-      children: {
-        where: { deletedAt: { isNull: true } },
-        orderBy: { position: 'asc' },
-      },
-    },
-  });
+  const tree = await getPageTree();
 
   return (
     <div className="flex size-full items-start">
