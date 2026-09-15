@@ -1,21 +1,31 @@
+import { asc, isNull } from 'drizzle-orm';
+import { cookies } from 'next/headers';
+import { db } from '@/src/db';
+import { pages } from '@/src/db/schema';
+import { requireAuth } from '@/src/lib/auth';
 import { Sidebar } from '@/src/components/Sidebar';
 import { SidebarShell } from '@/src/components/Sidebar/mobile-shell';
-import { getPageTree } from '@/src/db/queries';
-import { getSession } from '@/src/lib/session';
-import { redirect } from 'next/navigation';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { loggedIn } = await getSession();
-  if (!loggedIn) redirect('/login');
+  await requireAuth();
 
-  const tree = await getPageTree();
+  const collapsed = (await cookies()).get('sidebar_collapsed')?.value === 'true';
+
+  const nodes = await db
+    .select({
+      id: pages.id,
+      parentId: pages.parentId,
+      title: pages.title,
+      icon: pages.icon,
+      position: pages.position,
+    })
+    .from(pages)
+    .where(isNull(pages.deletedAt))
+    .orderBy(asc(pages.position));
 
   return (
-    <div className="flex size-full items-start">
-      <SidebarShell>
-        <Sidebar tree={tree} />
-      </SidebarShell>
-      <div className="flex h-full min-w-0 flex-1 flex-col items-start overflow-clip md:py-4">{children}</div>
-    </div>
+    <SidebarShell initialCollapsed={collapsed} sidebar={<Sidebar tree={nodes} />}>
+      {children}
+    </SidebarShell>
   );
 }
