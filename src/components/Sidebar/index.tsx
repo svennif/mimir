@@ -1,7 +1,8 @@
 import { Search, House, Plus, Settings, Trash2, ChevronDown, MoreHorizontal } from 'lucide-react';
 import { SidebarItem } from '../SidebarItem';
 import { NewPageButton } from '../Buttons/NewPageButton/page';
-import { PageNode, PageTree } from '../PageTree';
+import { SidebarTree } from './SidebarTree';
+import type { PageNode } from '@/src/lib/tree';
 
 export function Sidebar({ tree }: { tree: PageNode[] }) {
   return (
@@ -19,11 +20,11 @@ export function Sidebar({ tree }: { tree: PageNode[] }) {
         <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" />
       </nav>
       {/* Private pages */}
-      <div className="flex w-full flex-col items-start gap-px overflow-clip pt-3">
+      <div className="flex min-h-0 w-full flex-1 flex-col items-start gap-px overflow-clip pt-3">
         <div className="flex w-full items-start overflow-clip px-2 py-1">
           <p className="text-xs/4 font-medium text-ink-tertiary">Private</p>
         </div>
-        <PageTree nodes={tree} />
+        <SidebarTree nodes={tree} />
         <NewPageButton className="flex h-8 w-full items-center gap-2 rounded-md cursor-pointer px-2 py-1.5 text-sm/5 font-medium text-ink-secondary transition-colors hover:bg-hover" icon={<Plus className="size-4" />} label="Add a page" />
       </div>
       <div className="min-h-0 w-full flex-1" />
