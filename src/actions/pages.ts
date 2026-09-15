@@ -273,7 +273,7 @@ export async function movePage(input: {
   if (pageId === parentId) return { ok: false as const, error: 'SELF_PARENT' };
   if (afterId === pageId) return { ok: false as const, error: 'SELF_ANCHOR' };
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [page] = await tx
       .select({ id: pages.id })
       .from(pages)
@@ -356,4 +356,7 @@ export async function movePage(input: {
     // a layout revalidation would remount BlockNote and drop the cursor.
     return { ok: true as const, position };
   });
+
+  if (result.ok) revalidatePath('/', 'layout');
+  return result;
 }

@@ -81,13 +81,15 @@ export function SidebarTree({ nodes }: { nodes: PageNode[] }) {
   const handleRowOver = useCallback(
     (id: string, rect: DOMRect, clientY: number, meta: RowMeta) => {
       if (!activeRef.current) return;
+
+      const next = resolveIntent({ id, ...meta }, rect, clientY);
+
       autoScroll(clientY);
       setOverRoot(false);
-      pushIntent(resolveIntent({ id, ...meta }, rect, clientY));
+      pushIntent(next);
     },
     [autoScroll, pushIntent]
   );
-
   const commit = useCallback(() => {
     const movingId = activeRef.current;
     const current = intentRef.current;
@@ -148,15 +150,18 @@ export function SidebarTree({ nodes }: { nodes: PageNode[] }) {
     return () => document.removeEventListener('visibilitychange', resync);
   }, [router]);
 
-  const drag: DragApi = {
-    activeId,
-    blocked,
-    intent,
-    onDragStart: handleDragStart,
-    onRowOver: handleRowOver,
-    onDrop: commit,
-    onDragEnd: resetDrag,
-  };
+  const drag = useMemo<DragApi>(
+    () => ({
+      activeId,
+      blocked,
+      intent,
+      onDragStart: handleDragStart,
+      onRowOver: handleRowOver,
+      onDrop: commit,
+      onDragEnd: resetDrag,
+    }),
+    [activeId, blocked, intent, handleDragStart, handleRowOver, commit, resetDrag]
+  );
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col items-start gap-px overflow-clip pt-3">
