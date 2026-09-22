@@ -1,23 +1,27 @@
 'use client';
 
-import { useCreateBlockNote } from '@blocknote/react';
+import { BlockNoteContext, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import type { Theme } from '@blocknote/mantine';
 import type { PartialBlock, Block } from '@blocknote/core';
+import { useResolvedTheme } from '@/src/stores/theme';
 import '@blocknote/mantine/style.css';
 import './editor.css';
 
+// BlockNote writes these onto the editor's root as inline custom properties, so
+// pointing them at our own tokens is enough — one theme, and it follows the
+// palette without a dark twin.
 const theme: Theme = {
   colors: {
-    editor: { text: '#3f3f3b', background: 'transparent' },
-    menu: { text: '#3f3f3b', background: '#ffffff' },
-    tooltip: { text: '#3f3f3b', background: '#ffffff' },
-    hovered: { text: '#3f3f3b', background: 'rgba(60,60,55,0.05)' },
-    selected: { text: '#3f3f3b', background: 'rgba(124,158,143,0.16)' },
-    disabled: { text: '#adada5', background: '#f3f3ef' },
-    shadow: '#ebebe6',
-    border: '#ebebe6',
-    sideMenu: '#adada5',
+    editor: { text: 'var(--text-primary)', background: 'transparent' },
+    menu: { text: 'var(--text-primary)', background: 'var(--bg-tooltip)' },
+    tooltip: { text: 'var(--text-primary)', background: 'var(--bg-tooltip)' },
+    hovered: { text: 'var(--text-primary)', background: 'var(--bg-hover)' },
+    selected: { text: 'var(--text-primary)', background: 'var(--bg-active)' },
+    disabled: { text: 'var(--text-tertiary)', background: 'var(--bg-code)' },
+    shadow: 'var(--border-default)',
+    border: 'var(--border-default)',
+    sideMenu: 'var(--text-tertiary)',
   },
   borderRadius: 12,
   fontFamily: 'var(--font-jakarta), sans-serif',
@@ -27,6 +31,14 @@ export default function BlockNoteEditor({ initialContent, onDocumentChange }: { 
   const editor = useCreateBlockNote({
     initialContent: initialContent?.length ? initialContent : [{ type: 'heading', props: { level: 1 } }],
   });
+  const resolved = useResolvedTheme();
 
-  return <BlockNoteView editor={editor} theme={theme} className="w-full" onChange={() => onDocumentChange(editor.document)} />;
+  return (
+    // Given an object `theme`, BlockNote falls back to prefers-color-scheme for
+    // its own light/dark class — which is wrong the moment the user overrides
+    // the OS. This context is the only way to tell it which one we settled on.
+    <BlockNoteContext.Provider value={{ colorSchemePreference: resolved }}>
+      <BlockNoteView editor={editor} theme={theme} className="w-full" onChange={() => onDocumentChange(editor.document)} />
+    </BlockNoteContext.Provider>
+  );
 }

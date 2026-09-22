@@ -23,7 +23,7 @@ export function NewPageButton({
     <button
       type="button"
       aria-label={label ?? "New page"}
-      onClick={() => startTransition(() => createPage(parentId))}
+      onClick={() => startTransition(async () => { await createPage(parentId); })}
       disabled={pending}
       className={className}
     >
