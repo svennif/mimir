@@ -11,7 +11,7 @@ export function RestoreButton({ pageId, pageTitle }: { pageId: string; pageTitle
     <button
       type="button"
       className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-line bg-sheet px-2.5 text-xs font-semibold text-ink-secondary transition-colors hover:bg-hover hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
-      onClick={() => startTransition(() => restorePage(pageId))}
+      onClick={() => startTransition(async () => { await restorePage(pageId); })}
       disabled={pending}
       aria-label={`Restore ${pageTitle}`}
     >

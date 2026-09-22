@@ -40,7 +40,6 @@ export function useAutosave(pageId: string, initialVersion: number, initialTitle
         textContent: documentToPlainText(blocks),
         title,
         clientVersion: version.current,
-        revalidateTree: title !== lastTitle.current,
       });
 
       if (!res.ok) {
