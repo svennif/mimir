@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Menu, X, PanelLeft } from 'lucide-react';
 import { sidebarActions, sidebarStore } from '@/src/stores/sidebar';
+import { TOOLBAR_BUTTON, TOOLBAR_ROW } from '@/src/lib/toolbar';
 
 export function SidebarShell({ sidebar, initialCollapsed, children }: { sidebar: React.ReactNode; initialCollapsed: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -26,10 +27,6 @@ export function SidebarShell({ sidebar, initialCollapsed, children }: { sidebar:
 
   return (
     <div className="flex size-full">
-      <button type="button" onClick={() => setOpen(true)} aria-label="Open navigation" className={`fixed top-4 left-4 z-30 flex size-9 items-center justify-center rounded-md bg-sheet/90 text-ink-secondary backdrop-blur md:hidden ${open ? 'hidden' : ''}`}>
-        <Menu className="size-5" />
-      </button>
-
       {open && <div onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-ink/20 md:hidden" aria-hidden />}
 
       <div
@@ -45,12 +42,16 @@ export function SidebarShell({ sidebar, initialCollapsed, children }: { sidebar:
         <div className="min-h-0 w-70 flex-1 md:w-65">{sidebar}</div>
       </div>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
-        <header className="flex h-12 shrink-0 items-center gap-2 px-3">
-          <button type="button" onClick={sidebarActions.toggleCollapsed} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} className="hidden size-8 items-center justify-center rounded-md text-ink-secondary hover:bg-hover md:flex">
+      <main className="relative flex min-w-0 flex-1 flex-col overflow-y-auto">
+        {/* Left end of the toolbar line; the page's actions hold the right end. */}
+        <div className={`${TOOLBAR_ROW} left-4`}>
+          <button type="button" onClick={() => setOpen(true)} aria-label="Open navigation" aria-expanded={open} className={`${TOOLBAR_BUTTON} flex md:hidden`}>
+            <Menu className="size-4" />
+          </button>
+          <button type="button" onClick={sidebarActions.toggleCollapsed} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} className={`${TOOLBAR_BUTTON} hidden md:flex`}>
             <PanelLeft className="size-4" />
           </button>
-        </header>
+        </div>
         {children}
       </main>
     </div>
