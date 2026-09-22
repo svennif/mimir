@@ -1,4 +1,4 @@
-import { Search, House, Plus, Settings, Trash2, ChevronDown, MoreHorizontal } from 'lucide-react';
+import { House, Plus, Settings, Trash2 /* Search, ChevronDown, MoreHorizontal */ } from 'lucide-react';
 import { SidebarItem } from '../SidebarItem';
 import { NewPageButton } from '../Buttons/NewPageButton/page';
 import { SidebarTree } from './SidebarTree';
@@ -11,13 +11,14 @@ export function Sidebar({ tree }: { tree: PageNode[] }) {
       <div className="flex w-full items-center gap-2 overflow-clip px-2 py-1.5">
         <div className="flex size-5.5 shrink-0 items-center justify-center overflow-clip rounded-[11px] bg-accent text-[13px] font-semibold text-ink-inverse">M</div>
         <p className="min-w-0 flex-1 text-sm/5 font-semibold text-ink">Mimir</p>
-        <ChevronDown className="size-4 shrink-0 text-ink-secondary" />
-        <MoreHorizontal className="size-4 shrink-0 text-ink-secondary" />
+        {/* <ChevronDown className="size-4 shrink-0 text-ink-secondary" />
+        <MoreHorizontal className="size-4 shrink-0 text-ink-secondary" /> */}
       </div>
       {/* Menu */}
       <nav className="flex w-full flex-col items-start gap-px overflow-clip py-2">
         <SidebarItem href="/" icon={<House className="size-4" />} label="Home" />
-        <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" />
+        {/* Currently not being displayed as it's not set up */}
+        {/* <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" /> */}
       </nav>
       {/* Private pages */}
       <div className="flex min-h-0 w-full flex-1 flex-col items-start gap-px overflow-clip pt-3">

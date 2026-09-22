@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronRight, FileText, Folder } from 'lucide-react';
-import { SidebarItem } from '../SidebarItem';
+import { INDENT, ROW_PAD, SidebarItem } from '../SidebarItem';
 import { sidebarActions, sidebarStore } from '@/src/stores/sidebar';
 import { childrenOf, indexByParent } from '@/src/lib/tree';
 import type { Intent } from '@/src/lib/drop-intent';
@@ -65,24 +65,32 @@ export function PageTree({ byParent, parentId = null, depth = 0, drag }: { byPar
                 drag.onDragEnd();
               }}
               className={`relative rounded ${isDragging ? 'opacity-40' : ''} ${marker === 'inside' ? 'bg-blue-500/10 ring-1 ring-inset ring-blue-500' : ''}`}>
-              {(marker === 'before' || marker === 'after') && <div aria-hidden className={`pointer-events-none absolute right-2 z-20 h-0.5 bg-blue-500 ${marker === 'before' ? '-top-px' : '-bottom-px'}`} style={{ left: depth * 14 + 8 }} />}
+              {(marker === 'before' || marker === 'after') && <div aria-hidden className={`pointer-events-none absolute right-2 z-20 h-0.5 bg-blue-500 ${marker === 'before' ? '-top-px' : '-bottom-px'}`} style={{ left: depth * INDENT + ROW_PAD }} />}
 
-              {hasChildren && (
-                <button
-                  type="button"
-                  aria-label={isOpen ? 'Collapse' : 'Expand'}
-                  className="absolute top-1/2 z-10 -translate-y-1/2 rounded p-0.5 text-neutral-500 hover:bg-neutral-200"
-                  style={{ left: depth * 14 + 2 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    sidebarActions.toggle(node.id);
-                  }}>
-                  <ChevronRight className={`size-3 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
-                </button>
-              )}
-
-              <SidebarItem href={`/pages/${node.id}`} pageId={node.id} depth={depth} label={node.title || 'Untitled'} icon={node.icon ? <span className="text-sm leading-none">{node.icon}</span> : hasChildren ? <Folder className="size-4" /> : <FileText className="size-4" />} />
+              <SidebarItem
+                href={`/pages/${node.id}`}
+                pageId={node.id}
+                depth={depth}
+                label={node.title || 'Untitled'}
+                disclosure={
+                  hasChildren ? (
+                    <button
+                      type="button"
+                      data-disclosure
+                      aria-label={isOpen ? 'Collapse' : 'Expand'}
+                      aria-expanded={isOpen}
+                      className="flex size-5 cursor-pointer items-center justify-center rounded text-ink-tertiary opacity-0 transition-opacity hover:bg-active group-hover:opacity-100 focus-visible:opacity-100"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        sidebarActions.toggle(node.id);
+                      }}>
+                      <ChevronRight className={`size-3.5 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+                    </button>
+                  ) : undefined
+                }
+                icon={node.icon ? <span className="text-sm leading-none">{node.icon}</span> : hasChildren ? <Folder className="size-4" /> : <FileText className="size-4" />}
+              />
             </div>
 
             {hasChildren && isOpen && <PageTree byParent={byParent} parentId={node.id} depth={depth + 1} drag={drag} />}

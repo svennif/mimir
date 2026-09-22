@@ -3,6 +3,7 @@ import { RestoreButton } from '@/src/components/Buttons/RestoreButton/page';
 import { db } from '@/src/db';
 import { relativeTime } from '@/src/lib/format';
 import { FileText, Trash2 } from 'lucide-react';
+import { TOOLBAR_CLEARANCE } from '@/src/lib/toolbar';
 
 export default async function TrashPage() {
   const trashed = await db.query.pages.findMany({
@@ -12,7 +13,7 @@ export default async function TrashPage() {
 
   return (
     <section className="flex min-h-0 w-full flex-1 flex-col overflow-hidden border border-line bg-sheet shadow-sheet md:rounded-lg">
-      <header className="flex shrink-0 items-start justify-between gap-6 border-b border-line px-5 py-5 md:px-8 md:py-7">
+      <header className={`flex shrink-0 items-start justify-between gap-6 border-b border-line px-5 pb-5 md:px-8 md:pb-7 ${TOOLBAR_CLEARANCE}`}>
         <div>
           <div className="mb-1 flex items-center gap-2.5">
             <Trash2 className="size-5 text-ink-secondary" aria-hidden="true" />
