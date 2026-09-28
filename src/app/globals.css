@@ -20,11 +20,22 @@
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --shadow-sheet: 0 8px 24px -4px rgba(61, 61, 56, 0.05);
-  --shadow-overlay: 0 0 1px 1px rgba(15, 15, 15, 0.06), 0 4px 16px 0 rgba(15, 15, 15, 0.12);
+  /* Shadow geometry is theme-independent; only the ink in it changes. */
+  --shadow-sheet: 0 8px 24px -4px var(--shadow-sheet-ink);
+  --shadow-overlay: 0 0 1px 1px var(--shadow-overlay-ring), 0 4px 16px 0 var(--shadow-overlay-ink);
 }
 
+/* Which palette is live is decided by the class on <html>, painted server-side
+   in the root layout from the `theme` cookie:
+     .dark   — forced dark
+     .light  — forced light
+     neither — follow the OS, handled by the media query at the bottom.
+   That last case is why `system` needs no JS and can't flash: the browser has
+   already resolved it before the first paint. */
+
 :root {
+  color-scheme: light;
+
   --bg-canvas: #f1f1ec;
   --bg-sheet: #fdfdfc;
   --bg-code: #f3f3ef;
@@ -37,17 +48,56 @@
   --text-tertiary: #adada5;
   --text-inverse: #ffffff;
   --accent-primary: #7c9e8f;
+  --shadow-sheet-ink: rgba(61, 61, 56, 0.05);
+  --shadow-overlay-ring: rgba(15, 15, 15, 0.06);
+  --shadow-overlay-ink: rgba(15, 15, 15, 0.12);
 }
 
-/* Fill these from the Dark variant in your Figma file */
+/* Keep the two dark blocks below identical — CSS has no way to share them. */
+
 .dark {
+  color-scheme: dark;
+
   --bg-canvas: #1a1a18;
   --bg-sheet: #222220;
-  /* ... */
+  --bg-code: #262723;
+  --bg-tooltip: #282925;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(143, 184, 165, 0.18);
+  --border-default: #32332f;
+  --text-primary: #e4e4de;
+  --text-secondary: #9c9c94;
+  --text-tertiary: #6e6e67;
+  --text-inverse: #1d1e1b;
+  --accent-primary: #8fb8a5;
+  --shadow-sheet-ink: rgba(0, 0, 0, 0.32);
+  --shadow-overlay-ring: rgba(0, 0, 0, 0.5);
+  --shadow-overlay-ink: rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+
+    --bg-canvas: #1a1a18;
+    --bg-sheet: #222220;
+    --bg-code: #262723;
+    --bg-tooltip: #282925;
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    --bg-active: rgba(143, 184, 165, 0.18);
+    --border-default: #32332f;
+    --text-primary: #e4e4de;
+    --text-secondary: #9c9c94;
+    --text-tertiary: #6e6e67;
+    --text-inverse: #1d1e1b;
+    --accent-primary: #8fb8a5;
+    --shadow-sheet-ink: rgba(0, 0, 0, 0.32);
+    --shadow-overlay-ring: rgba(0, 0, 0, 0.5);
+    --shadow-overlay-ink: rgba(0, 0, 0, 0.45);
+  }
 }
 
 html,
 body {
   height: 100%;
 }
-

@@ -15,7 +15,7 @@ export function DeleteButton({ pageId, pageTitle }: { pageId: string; pageTitle:
         <Trash2 className="size-4" />
         Delete
       </button>
-      <DeleteModal open={open} pending={pending} pageTitle={pageTitle} onCancel={() => setOpen(false)} onConfirm={() => startTransition(() => deletePage(pageId))} />
+      <DeleteModal open={open} pending={pending} pageTitle={pageTitle} onCancel={() => setOpen(false)} onConfirm={() => startTransition(async () => { await deletePage(pageId); })} />
     </>
   );
 }

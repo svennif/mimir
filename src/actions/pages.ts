@@ -124,7 +124,7 @@ export async function savePage(input: {
   // Version mismatch = another tab wrote first. The client decides what to do.
   if (result.length === 0) return { ok: false as const, error: 'STALE' };
 
-  // No revalidate — the editor calls sidebarActions.setTitle directly.
+  // No revalidate — useAutosave calls router.refresh() itself when the title changed.
   return { ok: true as const, version: result[0].version };
 }
 

@@ -8,7 +8,7 @@ export function TrashButton({ pageId }: { pageId: string }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <button type="button" aria-label="Trash" onClick={() => startTransition(() => trashPage(pageId))} disabled={pending} className="flex size-8 shrink-0 items-center justify-center text-ink-secondary transition-colors hover:bg-hover hover:text-ink cursor-pointer">
+    <button type="button" aria-label="Trash" onClick={() => startTransition(async () => { await trashPage(pageId); })} disabled={pending} className="flex size-8 shrink-0 items-center justify-center text-ink-secondary transition-colors hover:bg-hover hover:text-ink cursor-pointer">
       <Trash2 className="size-4" />
     </button>
   );
