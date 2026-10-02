@@ -4,12 +4,6 @@ import { relations } from "./relations";
 
 const globalForDb = globalThis as unknown as { client?: ReturnType<typeof postgres> };
 
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is required");
-}
-
 function positiveInteger(value: string | undefined, fallback: number) {
   if (value === undefined || value === "") return fallback;
 
@@ -21,20 +15,42 @@ function positiveInteger(value: string | undefined, fallback: number) {
   return parsed;
 }
 
-const isVercel = process.env.VERCEL === "1";
-const maxConnections = positiveInteger(
-  process.env.DATABASE_MAX_CONNECTIONS,
-  isVercel ? 1 : 10,
-);
+function createDb() {
+  const databaseUrl = process.env.DATABASE_URL;
 
-const client = globalForDb.client ?? postgres(databaseUrl, {
-  max: maxConnections,
-  // Supabase's transaction pooler does not support prepared statements.
-  // Disabling them is also compatible with direct Postgres and Neon URLs.
-  prepare: process.env.DATABASE_PREPARED_STATEMENTS === "true",
-  ...(isVercel ? { idle_timeout: 20 } : {}),
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required");
+  }
+
+  const isVercel = process.env.VERCEL === "1";
+  const maxConnections = positiveInteger(
+    process.env.DATABASE_MAX_CONNECTIONS,
+    isVercel ? 1 : 10,
+  );
+
+  const client = globalForDb.client ?? postgres(databaseUrl, {
+    max: maxConnections,
+    // Supabase's transaction pooler does not support prepared statements.
+    // Disabling them is also compatible with direct Postgres and Neon URLs.
+    prepare: process.env.DATABASE_PREPARED_STATEMENTS === "true",
+    ...(isVercel ? { idle_timeout: 20 } : {}),
+  });
+
+  if (process.env.NODE_ENV !== "production") globalForDb.client = client;
+
+  return drizzle({ client, relations });
+}
+
+type Db = ReturnType<typeof createDb>;
+
+let instance: Db | undefined;
+
+// Created on first use rather than at import time, so `next build` can load
+// route modules (e.g. to collect segment config) without DATABASE_URL set.
+export const db = new Proxy({} as Db, {
+  get(_target, prop) {
+    instance ??= createDb();
+    const value = Reflect.get(instance, prop, instance);
+    return typeof value === "function" ? value.bind(instance) : value;
+  },
 });
-
-if (process.env.NODE_ENV !== "production") globalForDb.client = client;
-
-export const db = drizzle({ client, relations });
