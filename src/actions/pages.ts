@@ -1,8 +1,9 @@
 'use server';
 
-import { and, asc, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 import { generateKeyBetween } from 'fractional-indexing';
 import { revalidatePath } from 'next/cache';
+import { redirect, RedirectType } from 'next/navigation';
 import { db } from '@/src/db';
 import { pages } from '@/src/db/schema';
 import { requireAuth } from '@/src/lib/auth';
@@ -41,7 +42,8 @@ export async function createPage(parentId: string | null = null) {
     .returning(nodeColumns);
 
   // No revalidatePath, no redirect — the caller patches the store and navigates.
-  return { ok: true as const, page };
+  revalidatePath('/', 'layout');
+  redirect(`/pages/${page.id}`);
 }
 
 export async function renamePage(pageId: string, title: string) {
@@ -129,7 +131,7 @@ export async function savePage(input: {
 }
 
 // Move to trash — recoverable.
-export async function trashPage(pageId: string) {
+export async function trashPage(pageId: string, viewingId: string | undefined) {
   await requireAuth();
 
   // One timestamp per operation; restore matches on it so a child trashed
@@ -146,10 +148,51 @@ export async function trashPage(pageId: string) {
     RETURNING id, deleted_at
   `);
 
-  // The trash view is server-rendered and nothing on the client mirrors it.
-  revalidatePath('/trash');
+  const removedIds = removed.map((r) => r.id);
 
-  return { ok: true as const, ids: removed.map((r) => r.id) };
+  // The trash view is server-rendered and nothing on the client mirrors it.
+  revalidatePath('/', 'layout');
+
+  if (viewingId && removedIds.includes(viewingId)) {
+    redirect(await trashFallbackUrl(pageId), RedirectType.replace);
+  }
+
+  return { ok: true as const, ids: removedIds };
+}
+
+async function trashFallbackUrl(pageId: string) {
+  const [trashed] = await db
+    .select({ parentId: pages.parentId, position: pages.position })
+    .from(pages)
+    .where(eq(pages.id, pageId))
+    .limit(1);
+
+  if (!trashed) return '/';
+
+  const siblings = and(
+    trashed.parentId === null ? isNull(pages.parentId) : eq(pages.parentId, trashed.parentId),
+    isNull(pages.deletedAt),
+  );
+
+  const [prev] = await db
+    .select({ id: pages.id })
+    .from(pages)
+    .where(and(siblings, lt(pages.position, trashed.position)))
+    .orderBy(desc(pages.position))
+    .limit(1);
+  if (prev) return `/pages/${prev.id}`;
+
+  if (trashed.parentId) return `/pages/${trashed.parentId}`;
+
+  const [next] = await db
+    .select({ id: pages.id })
+    .from(pages)
+    .where(and(siblings, gt(pages.position, trashed.position)))
+    .orderBy(asc(pages.position))
+    .limit(1);
+  if (next) return `/pages/${next.id}`;
+
+  return '/';
 }
 
 export async function restorePage(pageId: string) {

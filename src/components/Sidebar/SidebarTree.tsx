@@ -164,10 +164,10 @@ export function SidebarTree({ nodes }: { nodes: PageNode[] }) {
   );
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col items-start gap-px overflow-clip pt-3">
+    <div className="flex min-h-0 w-full flex-col items-start gap-px overflow-y-auto pt-3" ref={scrollRef}>
       <PageTree byParent={byParent} drag={drag} />
       <div
-        className={`mt-1 min-h-12 flex-1 rounded transition-colors ${overRoot ? 'bg-blue-500/10 ring-1 ring-inset ring-blue-500' : ''}`}
+        className={`mt-1 rounded min-h-0 w-full h-2 transition-colors ${overRoot ? 'bg-blue-500/10 ring-1 ring-inset ring-blue-500' : ''}`}
         onDragOver={(e) => {
           if (!activeRef.current) return;
           e.preventDefault();
