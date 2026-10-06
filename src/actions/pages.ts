@@ -133,9 +133,7 @@ export async function trashPage(pageId: string) {
   await requireAuth();
 
   // One timestamp per operation; restore matches on it so a child trashed
-  // separately earlier doesn't come back with its parent. Not now() — that's
-  // transaction time and identical across statements.
-  const deletedAt = new Date();
+  // separately earlier doesn't come back with its parent.
 
   const removed = await db.execute<{ id: string }>(sql`
     WITH RECURSIVE subtree AS (
@@ -143,15 +141,15 @@ export async function trashPage(pageId: string) {
       UNION ALL
       SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
     )
-    UPDATE pages SET deleted_at = ${deletedAt}
+    UPDATE pages SET deleted_at = now()
     WHERE id IN (SELECT id FROM subtree) AND deleted_at IS NULL
-    RETURNING id
+    RETURNING id, deleted_at
   `);
 
   // The trash view is server-rendered and nothing on the client mirrors it.
   revalidatePath('/trash');
 
-  return { ok: true as const, ids: removed.map((r) => r.id), deletedAt };
+  return { ok: true as const, ids: removed.map((r) => r.id) };
 }
 
 export async function restorePage(pageId: string) {
@@ -180,7 +178,6 @@ export async function restorePage(pageId: string) {
       reparent = !parent || parent.deletedAt !== null;
     }
 
-    // Only rows trashed in the *same* operation come back.
     await tx.execute(sql`
       WITH RECURSIVE subtree AS (
         SELECT id FROM pages WHERE id = ${pageId}
@@ -188,7 +185,7 @@ export async function restorePage(pageId: string) {
         SELECT p.id FROM pages p JOIN subtree s ON p.parent_id = s.id
       )
       UPDATE pages SET deleted_at = NULL
-      WHERE id IN (SELECT id FROM subtree) AND deleted_at = ${root.deletedAt}
+      WHERE id IN (SELECT id FROM subtree) AND deleted_at = (SELECT deleted_at WHERE id = ${pageId})
     `);
 
     if (reparent) {
