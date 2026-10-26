@@ -20,12 +20,11 @@ export function Sidebar({ tree }: { tree: PageNode[] }) {
         {/* Currently not being displayed as it's not set up */}
         {/* <SidebarItem href="/search" icon={<Search className="size-4" />} label="Search" /> */}
       </nav>
-      {/* Private pages */}
-      {/* Content height, not flex-1: it grows with the tree until it meets the
-          footer, then min-h-0 lets it shrink and the tree scrolls. */}
+      {/* Pages. Content height, not flex-1: it grows with the tree until it
+          meets the footer, then min-h-0 lets it shrink and the tree scrolls. */}
       <div className="flex min-h-0 w-full flex-col items-start gap-px overflow-clip pt-3">
         <div className="flex w-full items-start overflow-clip px-2 py-1">
-          <p className="text-xs/4 font-medium text-ink-tertiary">Private</p>
+          <p className="text-xs/4 font-medium text-ink-tertiary">Pages</p>
         </div>
         <SidebarTree nodes={tree} />
         <NewPageButton className="flex h-8 w-full items-center gap-2 rounded-md cursor-pointer px-2 py-1.5 text-sm/5 font-medium text-ink-secondary transition-colors hover:bg-hover" icon={<Plus className="size-4" />} label="Add a page" />
