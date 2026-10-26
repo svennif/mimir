@@ -12,9 +12,8 @@ const OPTIONS: Record<Theme, { label: string; icon: React.ReactNode }> = {
 
 export function ThemeControl() {
   // On the first client render this is still the pristine 'system' the server
-  // rendered, then it corrects to the real value — same one-frame settle the
-  // sidebar's collapsed state has. The page itself never flashes, because the
-  // palette comes from the class on <html>, not from here.
+  // rendered, then it corrects to the real value. The page itself never
+  // flashes, because the palette comes from the class on <html>, not from here.
   const theme = themeStore((s) => s.theme);
 
   return (

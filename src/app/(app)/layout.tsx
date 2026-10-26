@@ -3,13 +3,16 @@ import { cookies } from 'next/headers';
 import { db } from '@/src/db';
 import { pages } from '@/src/db/schema';
 import { requireAuth } from '@/src/lib/auth';
+import { SIDEBAR_COLLAPSED_COOKIE, SIDEBAR_WIDTH_COOKIE, parseSidebarWidth } from '@/src/lib/sidebar';
 import { Sidebar } from '@/src/components/Sidebar';
 import { SidebarShell } from '@/src/components/Sidebar/mobile-shell';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   await requireAuth();
 
-  const collapsed = (await cookies()).get('sidebar_collapsed')?.value === 'true';
+  const cookieStore = await cookies();
+  const collapsed = cookieStore.get(SIDEBAR_COLLAPSED_COOKIE)?.value === 'true';
+  const width = parseSidebarWidth(cookieStore.get(SIDEBAR_WIDTH_COOKIE)?.value);
 
   const nodes = await db
     .select({
@@ -24,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .orderBy(asc(pages.position));
 
   return (
-    <SidebarShell initialCollapsed={collapsed} sidebar={<Sidebar tree={nodes} />}>
+    <SidebarShell initialCollapsed={collapsed} initialWidth={width} sidebar={<Sidebar tree={nodes} />}>
       {children}
     </SidebarShell>
   );
