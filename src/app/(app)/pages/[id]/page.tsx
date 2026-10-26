@@ -26,7 +26,7 @@ export default async function PageView({ params }: { params: Promise<{ id: strin
   if (!page) notFound();
 
   return (
-    <DocumentSheet isFavorite={page.favoritePosition !== null}>
+    <DocumentSheet pageId={page.id} isFavorite={page.favoritePosition !== null}>
       <DocumentBody key={page.id} pageId={page.id} initialContent={page.content as PartialBlock[]} initialVersion={page.version} initialTitle={page.title} initialTextContent={page.textContent} initialUpdatedAt={page.updatedAt} />
     </DocumentSheet>
   );

@@ -64,7 +64,7 @@ export async function toggleFavourite(pageId: string) {
 
   // Read-then-write needs a transaction and a row lock, or two fast clicks
   // lose a toggle.
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [page] = await tx
       .select({ favoritePosition: pages.favoritePosition })
       .from(pages)
@@ -100,6 +100,10 @@ export async function toggleFavourite(pageId: string) {
 
     return { ok: true as const, favoritePosition };
   });
+
+  // The star's prop and Home's favourites list both come from the server.
+  if (result.ok) revalidatePath('/', 'layout');
+  return result;
 }
 
 export async function savePage(input: {
