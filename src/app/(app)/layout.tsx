@@ -1,7 +1,8 @@
-import { asc, isNull } from 'drizzle-orm';
+import { and, asc, isNotNull, isNull } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { db } from '@/src/db';
 import { pages } from '@/src/db/schema';
+import { getDisplayName } from '@/src/db/queries';
 import { requireAuth } from '@/src/lib/auth';
 import { SIDEBAR_COLLAPSED_COOKIE, SIDEBAR_WIDTH_COOKIE, parseSidebarWidth } from '@/src/lib/sidebar';
 import { Sidebar } from '@/src/components/Sidebar';
@@ -26,8 +27,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .where(isNull(pages.deletedAt))
     .orderBy(asc(pages.position));
 
+  const favourites = await db
+    .select({ id: pages.id, title: pages.title, icon: pages.icon })
+    .from(pages)
+    .where(and(isNotNull(pages.favoritePosition), isNull(pages.deletedAt)))
+    .orderBy(asc(pages.favoritePosition));
+
+  const name = await getDisplayName();
+
   return (
-    <SidebarShell initialCollapsed={collapsed} initialWidth={width} sidebar={<Sidebar tree={nodes} />}>
+    <SidebarShell initialCollapsed={collapsed} initialWidth={width} sidebar={<Sidebar tree={nodes} favourites={favourites} name={name} />}>
       {children}
     </SidebarShell>
   );

@@ -22,13 +22,13 @@ function today(): string {
  * the header from shifting when they do. Snapshots are strings, so repeated
  * reads compare equal and don't loop.
  */
-export function Greeting() {
+export function Greeting({ name }: { name: string | null }) {
   const hello = useSyncExternalStore(subscribe, greeting, () => null);
   const date = useSyncExternalStore(subscribe, today, () => null);
 
   return (
-    <div>
-      <h1 className="h-7 text-xl font-semibold tracking-[-0.02em] text-ink">{hello}</h1>
+    <div className="min-w-0">
+      <h1 className="h-7 truncate text-xl font-semibold tracking-[-0.02em] text-ink">{hello && (name ? `${hello}, ${name}` : hello)}</h1>
       <p className="mt-1 h-5 text-sm text-ink-secondary">{date}</p>
     </div>
   );

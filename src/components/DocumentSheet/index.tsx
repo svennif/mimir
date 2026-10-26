@@ -1,13 +1,12 @@
-import { Star, MessageSquare, MoreHorizontal } from 'lucide-react';
+import { MessageSquare, MoreHorizontal } from 'lucide-react';
 import { TOOLBAR_BUTTON, TOOLBAR_ROW } from '@/src/lib/toolbar';
+import { FavouriteButton } from '../Buttons/FavouriteButton/page';
 
-export function DocumentSheet({ children, isFavorite }: { children: React.ReactNode; isFavorite: boolean }) {
+export function DocumentSheet({ children, pageId, isFavorite }: { children: React.ReactNode; pageId: string; isFavorite: boolean }) {
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col items-start overflow-clip md:rounded-lg border border-line bg-sheet shadow-sheet">
       <div className={`${TOOLBAR_ROW} right-4`}>
-        <button name='Favourite' className={`${TOOLBAR_BUTTON} flex`}>
-          <Star className={`size-4 ${isFavorite ? 'fill-accent text-accent' : ''}`} />
-        </button>
+        <FavouriteButton pageId={pageId} isFavourite={isFavorite} />
         <button name='Comment' className={`${TOOLBAR_BUTTON} flex`}>
           <MessageSquare className="size-4" />
         </button>

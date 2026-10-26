@@ -1,5 +1,19 @@
 import { db } from '@/src/db';
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { settings } from '@/src/db/schema';
+import { DISPLAY_NAME_KEY } from '@/src/lib/settings';
+
+/** The name set on the Settings page, or null if there isn't one. */
+export async function getDisplayName(): Promise<string | null> {
+  const [row] = await db
+    .select({ value: settings.value })
+    .from(settings)
+    .where(eq(settings.key, DISPLAY_NAME_KEY))
+    .limit(1);
+
+  // jsonb comes back as unknown — only trust a non-empty string.
+  return typeof row?.value === 'string' && row.value ? row.value : null;
+}
 
 type TreeRow = {
   id: string;
