@@ -19,46 +19,60 @@ export function useAutosave(pageId: string, initialVersion: number, initialTitle
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstDirtyAt = useRef<number | null>(null);
   const paused = useRef(false);
+  const inFlight = useRef(false);
   const [status, setStatus] = useState<Status>("idle");
   const [savedAt, setSavedAt] = useState<Date | null>(null);
 
   const flush = useCallback(async () => {
-    if (paused.current || !pending.current) return;
-
-    const blocks = pending.current;
-    pending.current = null;
-    firstDirtyAt.current = null;
-    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
-
-    setStatus("saving");
-    const title = extractTitle(blocks);
+    // One save at a time: a second request would send the same clientVersion
+    // and come back STALE. Leave the blocks in `pending`; the running loop
+    // below picks them up when its current save finishes.
+    if (inFlight.current) return;
+    inFlight.current = true;
 
     try {
-      const res = await savePage({
-        pageId,
-        content: blocks,
-        textContent: documentToPlainText(blocks),
-        title,
-        clientVersion: version.current,
-      });
+      while (!paused.current && pending.current) {
+        const blocks = pending.current;
+        pending.current = null;
+        firstDirtyAt.current = null;
+        if (timer.current) { clearTimeout(timer.current); timer.current = null; }
 
-      if (!res.ok) {
-        paused.current = true; // stop the loop; don't retry into a wall
-        setStatus("conflict");
-        return;
+        setStatus("saving");
+        const title = extractTitle(blocks);
+
+        let res: Awaited<ReturnType<typeof savePage>>;
+        try {
+          res = await savePage({
+            pageId,
+            content: blocks,
+            textContent: documentToPlainText(blocks),
+            title,
+            clientVersion: version.current,
+          });
+        } catch (err) {
+          console.error("savePage failed:", err);
+          pending.current ??= blocks; // don't drop the edit; next change or tab-hide retries it
+          setStatus("error");
+          return;
+        }
+
+        if (!res.ok) {
+          paused.current = true; // stop the loop; don't retry into a wall
+          setStatus("conflict");
+          return;
+        }
+
+        const titleChanged = title !== lastTitle.current; // compare BEFORE assigning
+
+        version.current = res.version;
+        lastTitle.current = title;
+        setSavedAt(new Date());
+        setStatus("saved");
+
+        if (titleChanged) router.refresh();
       }
-
-      const titleChanged = title !== lastTitle.current; // compare BEFORE assigning
-
-      version.current = res.version;
-      lastTitle.current = title;
-      setSavedAt(new Date());
-      setStatus("saved");
-
-      if (titleChanged) router.refresh();
-    } catch (err) {
-      console.error("savePage failed:", err);
-      setStatus("error");
+    } finally {
+      inFlight.current = false;
     }
   }, [pageId, router]);
 
