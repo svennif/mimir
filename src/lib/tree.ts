@@ -12,6 +12,12 @@ export type FlatRow = PageNode & {
   expanded: boolean;
 }
 
+// Fractional indexes compare by code point ('B' < 'a'). Sort with this rather
+// than SQL ORDER BY, whose locale collation can disagree.
+export function byPosition(a: { position: string }, b: { position: string }) {
+  return a.position < b.position ? -1 : a.position > b.position ? 1 : 0;
+}
+
 export function indexByParent(nodes: PageNode[]) {
   const map = new Map<string, PageNode[]>();
   for (const n of nodes) {
@@ -21,7 +27,7 @@ export function indexByParent(nodes: PageNode[]) {
     else map.set(key, [n]);
   }
   for (const list of map.values()) {
-    list.sort((a, b) => (a.position < b.position ? -1 : a.position > b.position ? 1 : 0));
+    list.sort(byPosition);
   }
   return map;
 }
