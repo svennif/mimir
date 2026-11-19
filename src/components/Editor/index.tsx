@@ -8,6 +8,6 @@ const BlockNoteEditor = dynamic(() => import('./BlockNoteEditor'), {
   loading: () => <div className="text-sm text-ink-tertiary">Loading editor…</div>,
 });
 
-export function Editor({ initialContent, onDocumentChange }: { initialContent?: PartialBlock[]; onDocumentChange: (blocks: Block[]) => void }) {
-  return <BlockNoteEditor initialContent={initialContent} onDocumentChange={onDocumentChange} />;
+export function Editor({ pageId, initialContent, onDocumentChange }: { pageId: string; initialContent?: PartialBlock[]; onDocumentChange: (blocks: Block[]) => void }) {
+  return <BlockNoteEditor pageId={pageId} initialContent={initialContent} onDocumentChange={onDocumentChange} />;
 }

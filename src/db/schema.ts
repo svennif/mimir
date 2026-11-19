@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
-  pgTable, uuid, text, jsonb, timestamp, index, uniqueIndex, type AnyPgColumn, integer
+  pgTable, uuid, text, jsonb, timestamp, index, uniqueIndex, type AnyPgColumn, integer, bytea
 } from "drizzle-orm/pg-core";
 
 export const pages = pgTable("pages", {
@@ -41,6 +41,20 @@ export const comments = pgTable("comments", {
 }, (table) => [
   index("comments_page_idx").on(table.pageId),
   index("comments_resolved_created_idx").on(table.resolvedAt, table.createdAt),
+]);
+
+// Uploaded images, stored in Postgres so a pg_dump backs them up with the notes.
+// The page's content references a file only by its URL (/api/files/<id>), so
+// page_id is what ties the bytes to a page: hard-deleting the page cascades here.
+export const files = pgTable("files", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pageId: uuid("page_id").notNull().references(() => pages.id, { onDelete: "cascade" }),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(), // bytes; lets us list or total sizes without reading `data`
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("files_page_idx").on(table.pageId),
 ]);
 
 export const settings = pgTable("settings", {

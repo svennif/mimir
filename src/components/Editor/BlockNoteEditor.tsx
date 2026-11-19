@@ -5,6 +5,7 @@ import { BlockNoteView } from '@blocknote/mantine';
 import type { Theme } from '@blocknote/mantine';
 import type { PartialBlock, Block } from '@blocknote/core';
 import { useResolvedTheme } from '@/src/stores/theme';
+import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from '@/src/lib/files';
 import '@blocknote/mantine/style.css';
 import './editor.css';
 
@@ -27,9 +28,31 @@ const theme: Theme = {
   fontFamily: 'var(--font-jakarta), sans-serif',
 };
 
-export default function BlockNoteEditor({ initialContent, onDocumentChange }: { initialContent?: PartialBlock[]; onDocumentChange: (blocks: Block[]) => void }) {
+// Setting `uploadFile` is all it takes for BlockNote to accept pasted and dropped
+// images and to show an "Upload" tab in the image block. Without it, BlockNote
+// assumes the app can't store files and offers only "Embed" (a URL).
+// Throwing is the failure path: BlockNote leaves an empty image block (which can be
+// retried) on paste, and shows an error in the Upload tab.
+async function uploadFile(pageId: string, file: File): Promise<string> {
+  // Checked again on the server; checking here skips a pointless upload.
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) throw new Error(`Unsupported file type: ${file.type}`);
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error('File too large');
+
+  const body = new FormData();
+  body.append('file', file);
+  body.append('pageId', pageId);
+
+  const res = await fetch('/api/files', { method: 'POST', body });
+  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+
+  const { url } = (await res.json()) as { url: string };
+  return url;
+}
+
+export default function BlockNoteEditor({ pageId, initialContent, onDocumentChange }: { pageId: string; initialContent?: PartialBlock[]; onDocumentChange: (blocks: Block[]) => void }) {
   const editor = useCreateBlockNote({
     initialContent: initialContent?.length ? initialContent : [{ type: 'heading', props: { level: 1 } }],
+    uploadFile: (file) => uploadFile(pageId, file),
   });
   const resolved = useResolvedTheme();
 

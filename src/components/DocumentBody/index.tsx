@@ -65,7 +65,7 @@ export function DocumentBody({
         )}
       </div>
 
-      <Editor initialContent={initialContent} onDocumentChange={handleChange} />
+      <Editor pageId={pageId} initialContent={initialContent} onDocumentChange={handleChange} />
     </>
   );
 }
