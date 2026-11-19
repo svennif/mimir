@@ -2,6 +2,7 @@ import { db } from '@/src/db';
 import { files } from '@/src/db/schema';
 import { getSession } from '@/src/lib/session';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from '@/src/lib/files';
+import { compressImage } from '@/src/lib/compress-image';
 
 // A route handler rather than a server action: actions cap the request body at
 // 1MB by default, which is smaller than a typical screenshot.
@@ -44,13 +45,22 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Page not found' }, { status: 404 });
   }
 
+  let compressed: Awaited<ReturnType<typeof compressImage>>;
+  try {
+    compressed = await compressImage(Buffer.from(await file.arrayBuffer()), file.type);
+  } catch {
+    // The type check above trusts the browser's label; this is where a file
+    // that only claims to be an image gets caught.
+    return Response.json({ error: 'Not a readable image' }, { status: 415 });
+  }
+
   const [row] = await db
     .insert(files)
     .values({
       pageId: page.id,
-      mimeType: file.type,
-      size: file.size,
-      data: Buffer.from(await file.arrayBuffer()),
+      mimeType: compressed.mimeType,
+      size: compressed.data.length,
+      data: compressed.data,
     })
     .returning({ id: files.id });
 
