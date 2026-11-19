@@ -43,7 +43,12 @@ async function uploadFile(pageId: string, file: File): Promise<string> {
   body.append('pageId', pageId);
 
   const res = await fetch('/api/files', { method: 'POST', body });
-  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  if (!res.ok) {
+    // The server's reason (e.g. "still over 2MB after compression") is what the
+    // Upload tab shows; the status code alone says nothing useful.
+    const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(error ?? `Upload failed (${res.status})`);
+  }
 
   const { url } = (await res.json()) as { url: string };
   return url;

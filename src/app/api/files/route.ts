@@ -2,7 +2,7 @@ import { db } from '@/src/db';
 import { files } from '@/src/db/schema';
 import { getSession } from '@/src/lib/session';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from '@/src/lib/files';
-import { compressImage } from '@/src/lib/compress-image';
+import { compressImage, ImageTooLargeError } from '@/src/lib/compress-image';
 
 // A route handler rather than a server action: actions cap the request body at
 // 1MB by default, which is smaller than a typical screenshot.
@@ -48,7 +48,10 @@ export async function POST(request: Request) {
   let compressed: Awaited<ReturnType<typeof compressImage>>;
   try {
     compressed = await compressImage(Buffer.from(await file.arrayBuffer()), file.type);
-  } catch {
+  } catch (err) {
+    if (err instanceof ImageTooLargeError) {
+      return Response.json({ error: err.message }, { status: 413 });
+    }
     // The type check above trusts the browser's label; this is where a file
     // that only claims to be an image gets caught.
     return Response.json({ error: 'Not a readable image' }, { status: 415 });

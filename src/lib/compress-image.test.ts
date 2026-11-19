@@ -2,7 +2,7 @@
 // sharp is a native module working on Node Buffers; jsdom's globals only get in the way.
 import { describe, expect, test } from 'vitest';
 import sharp from 'sharp';
-import { compressImage } from './compress-image';
+import { compressImage, ImageTooLargeError } from './compress-image';
 
 // Random pixels don't compress, so a "photo" of noise is a realistic worst case
 // for size, and big enough that re-encoding clearly pays off.
@@ -43,6 +43,23 @@ describe('compressImage', () => {
 
     expect(out.mimeType).toBe('image/webp');
     expect(out.data).toBe(input);
+  });
+
+  test('falls back to a smaller, lossier pass when the first result is over the cap', async () => {
+    const input = await noiseImage(3000, 3000, 'jpeg');
+    // No cap here: under the default 2MB this image would already need the second pass.
+    const firstPass = await compressImage(input, 'image/jpeg', Infinity);
+    // A cap the first pass just misses forces the second one.
+    const out = await compressImage(input, 'image/jpeg', firstPass.data.length - 1);
+
+    expect(out.data.length).toBeLessThan(firstPass.data.length);
+    const meta = await sharp(out.data).metadata();
+    expect([meta.width, meta.height]).toEqual([1920, 1920]);
+  });
+
+  test('refuses an image that no pass gets under the cap', async () => {
+    const input = await noiseImage(500, 500, 'jpeg');
+    await expect(compressImage(input, 'image/jpeg', 100)).rejects.toBeInstanceOf(ImageTooLargeError);
   });
 
   test('rejects bytes that only claim to be an image', async () => {

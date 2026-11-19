@@ -4,9 +4,11 @@ import { and, asc, desc, eq, gt, isNotNull, isNull, lt, sql } from 'drizzle-orm'
 import { generateKeyBetween } from 'fractional-indexing';
 import { revalidatePath } from 'next/cache';
 import { redirect, RedirectType } from 'next/navigation';
+import { after } from 'next/server';
 import { db } from '@/src/db';
 import { pages } from '@/src/db/schema';
 import { requireAuth } from '@/src/lib/auth';
+import { maybeSweepOrphanedFiles } from '@/src/lib/orphaned-files';
 
 // Exactly the shape the sidebar store holds. If you add a field to PageNode,
 // add it here and in /api/pages/tree too.
@@ -129,6 +131,11 @@ export async function savePage(input: {
 
   // Version mismatch = another tab wrote first. The client decides what to do.
   if (result.length === 0) return { ok: false as const, error: 'STALE' };
+
+  // A save is the only way an image leaves a page, so it's the natural moment to
+  // look for orphans. after() runs it once the response is sent, so autosave
+  // never waits on it.
+  after(maybeSweepOrphanedFiles);
 
   // No revalidate — useAutosave calls router.refresh() itself when the title changed.
   return { ok: true as const, version: result[0].version };

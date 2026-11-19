@@ -1,0 +1,1 @@
+ALTER TABLE "files" ADD COLUMN "orphaned_at" timestamp with time zone;
